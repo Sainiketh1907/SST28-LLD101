@@ -4,24 +4,49 @@ public class ClassroomController {
     public ClassroomController(DeviceRegistry reg) { this.reg = reg; }
 
     public void startClass() {
-        SmartClassroomDevice pj = reg.getFirstOfType("Projector");
-        pj.powerOn();
-        pj.connectInput("HDMI-1");
+        // Get projector by type and use its specific capabilities
+        Object pjObj = reg.getFirstOfType("Projector");
+        if (pjObj instanceof PowerControllable) {
+            ((PowerControllable) pjObj).powerOn();
+        }
+        if (pjObj instanceof InputConnectable) {
+            ((InputConnectable) pjObj).connectInput("HDMI-1");
+        }
 
-        SmartClassroomDevice lights = reg.getFirstOfType("LightsPanel");
-        lights.setBrightness(60);
+        // Get lights by type and use its specific capabilities
+        Object lightsObj = reg.getFirstOfType("LightsPanel");
+        if (lightsObj instanceof BrightnessControllable) {
+            ((BrightnessControllable) lightsObj).setBrightness(60);
+        }
 
-        SmartClassroomDevice ac = reg.getFirstOfType("AirConditioner");
-        ac.setTemperatureC(24);
+        // Get AC by type and use its specific capabilities
+        Object acObj = reg.getFirstOfType("AirConditioner");
+        if (acObj instanceof TemperatureControllable) {
+            ((TemperatureControllable) acObj).setTemperatureC(24);
+        }
 
-        SmartClassroomDevice scan = reg.getFirstOfType("AttendanceScanner");
-        System.out.println("Attendance scanned: present=" + scan.scanAttendance());
+        // Get scanner by type and use its specific capabilities
+        Object scanObj = reg.getFirstOfType("AttendanceScanner");
+        if (scanObj instanceof ScanningCapable) {
+            System.out.println("Attendance scanned: present=" + ((ScanningCapable) scanObj).scanAttendance());
+        }
     }
 
     public void endClass() {
         System.out.println("Shutdown sequence:");
-        reg.getFirstOfType("Projector").powerOff();
-        reg.getFirstOfType("LightsPanel").powerOff();
-        reg.getFirstOfType("AirConditioner").powerOff();
+        Object pjObj = reg.getFirstOfType("Projector");
+        if (pjObj instanceof PowerControllable) {
+            ((PowerControllable) pjObj).powerOff();
+        }
+        
+        Object lightsObj = reg.getFirstOfType("LightsPanel");
+        if (lightsObj instanceof PowerControllable) {
+            ((PowerControllable) lightsObj).powerOff();
+        }
+        
+        Object acObj = reg.getFirstOfType("AirConditioner");
+        if (acObj instanceof PowerControllable) {
+            ((PowerControllable) acObj).powerOff();
+        }
     }
 }
